@@ -9,6 +9,9 @@ export const useFetchSignup = () => {
     email: string;
     password: string;
     confirm_password: string;
+    first_name: string;
+    last_name: string;
+
   }) => {
     setLoading(true);
     setError(null);
@@ -18,7 +21,7 @@ export const useFetchSignup = () => {
       setLoading(false);
       return userData;
     } catch (error) {
-  
+
       setError((error as Error).message);
       setLoading(false);
       return null;

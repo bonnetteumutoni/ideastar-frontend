@@ -35,3 +35,4 @@ export async function fetchLogin(credentials: { email: string; password: string 
     throw new Error((error as Error).message);
   }
 }
+

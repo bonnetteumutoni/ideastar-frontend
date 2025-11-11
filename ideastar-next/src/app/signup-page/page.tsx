@@ -8,6 +8,8 @@ import { FcGoogle } from "react-icons/fc";
 import { useRouter } from 'next/navigation';
 
 export default function SignupForm() {
+  const [first_name, setfirst_name] = useState('');
+  const [last_name, setlast_name] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm_password, setConfirmPassword] = useState('');
@@ -28,7 +30,7 @@ export default function SignupForm() {
       setValidationError("Passwords don't match");
       return;
     }
-    const result = await signup({ email, password,confirm_password });
+    const result = await signup({ first_name, last_name, email, password, confirm_password });
     
     if (result) {
       router.push('/signin-page');
@@ -65,6 +67,41 @@ export default function SignupForm() {
             )}
             
             <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="flex space-x-4">
+                <div className="flex-1">
+                  <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1" style={{ ...inknutStyle }}>
+                    First Name
+                  </label>
+                  <input
+                    id="first_name"
+                    name="first_name"
+                    type="text"
+                    autoComplete="given-name"
+                    required
+                    value={first_name}
+                    onChange={(e) => setfirst_name(e.target.value)}
+                    placeholder="First name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#AC7A15] focus:border-transparent placeholder:italic placeholder:opacity-70"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1" style={{ ...inknutStyle }}>
+                    Last Name
+                  </label>
+                  <input
+                    id="last_name"
+                    name="last_name"
+                    type="text"
+                    autoComplete="family-name"
+                    required
+                    value={last_name}
+                    onChange={(e) => setlast_name(e.target.value)}
+                    placeholder="Last name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#AC7A15] focus:border-transparent placeholder:italic placeholder:opacity-70"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1" style={{ ...inknutStyle }}>
                   Email
