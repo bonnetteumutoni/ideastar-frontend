@@ -2,13 +2,17 @@ type ProfileUpdatePayload = {
   email: string;
   first_name: string;
   last_name: string;
+  followers_count: number;
+  following_count: number;
+  created_at: string;
+  updated_at: string;
 };
 
 export async function fetchProfile() {
   if (typeof window === "undefined") {
     throw new Error("fetchProfile can only run in the browser");
   }
-  
+
   const token = localStorage.getItem("accessToken");
   const userString = localStorage.getItem("user");
   let userId: string | null = null;
@@ -35,13 +39,13 @@ export async function fetchProfile() {
         Authorization: `Token ${token}`,
       },
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Failed to fetch profile");
     }
-    
-    return await response.json(); 
+
+    return await response.json();
   } catch (error) {
     throw new Error((error as Error).message);
   }
@@ -51,7 +55,7 @@ export async function updateUser(data: FormData | ProfileUpdatePayload) {
   if (typeof window === "undefined") {
     throw new Error("Failed to update user");
   }
-  
+
   const token = localStorage.getItem("accessToken");
   const userString = localStorage.getItem("user");
   let userId: string | null = null;
@@ -61,7 +65,7 @@ export async function updateUser(data: FormData | ProfileUpdatePayload) {
       const userObj = JSON.parse(userString);
       userId = userObj.id ? String(userObj.id) : null;
     } catch {
-      
+
     }
   }
 
@@ -94,8 +98,8 @@ export async function updateUser(data: FormData | ProfileUpdatePayload) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Failed to update profile");
     }
-    
-    return await response.json(); 
+
+    return await response.json();
   } catch (error) {
     throw new Error((error as Error).message);
   }
