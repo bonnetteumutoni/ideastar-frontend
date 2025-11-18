@@ -7,15 +7,6 @@ import useFetchUsers from '@/app/hooks/useFetchProfile';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-interface User {
-    id: string;
-    name: string;
-    first_name: string;
-    last_name?: string;
-    profile_image: string;
-    email?: string;
-}
-
 const Navigation: React.FC = () => {
     const { user, loading, error } = useFetchUsers();
     const [searchQuery, setSearchQuery] = useState('');
@@ -36,7 +27,7 @@ const Navigation: React.FC = () => {
     if (!isClient || loading) {
         return (
             <div className="bg-gray-50">
-                <header className="bg-white shadow-sm border-b border-gray-200">
+                <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50">
                     <div className="px-4 py-3 flex items-center justify-between">
                         <div className="flex items-center">
                             <img
@@ -55,7 +46,7 @@ const Navigation: React.FC = () => {
                         </div>
                     </div>
                 </header>
-                <nav className="bg-[#2F5A2B]">
+                <nav className="fixed top-16 left-0 right-0 bg-[#2F5A2B] z-40">
                     <div className="px-4 py-3 flex justify-between">
                         <div className="flex items-center justify-center">
                             <div className="relative w-full max-w-md">
@@ -81,6 +72,8 @@ const Navigation: React.FC = () => {
                         </div>
                     </div>
                 </nav>
+                <div className="pt-40">
+                </div>
             </div>
         );
     }
@@ -95,7 +88,7 @@ const Navigation: React.FC = () => {
 
     return (
         <div className="bg-gray-50">
-            <header className="bg-white shadow-sm border-b border-gray-200">
+            <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50">
                 <div className="px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center">
                         <img
@@ -118,7 +111,7 @@ const Navigation: React.FC = () => {
                     </div>
                 </div>
             </header>
-            <nav className="bg-[#2F5A2B]">
+            <nav className="fixed top-16 left-0 right-0 bg-[#2F5A2B] z-40">
                 <div className="px-4 py-3 flex justify-between">
                     <div className="flex items-center justify-center">
                         <div className="relative w-full max-w-md">
@@ -161,6 +154,8 @@ const Navigation: React.FC = () => {
                     </div>
                 </div>
             </nav>
+            <div className="pt-40">
+            </div>
         </div>
     );
 };

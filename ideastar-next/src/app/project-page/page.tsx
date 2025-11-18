@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { FiEdit, FiPlus, FiBarChart2, FiX } from 'react-icons/fi';
 import useFetchUsers from '../hooks/useFetchProfile';
 import useFetchProjects from '../hooks/useFetchProjects';
-import { fetchProfile, updateUser } from '../utils/fetchProfile';
+import { updateUser } from '../utils/fetchProfile';
 import Navigation from '../sharedComponents/Navigation';
 
 export default function ProfilePage() {
@@ -12,6 +12,7 @@ export default function ProfilePage() {
   const { projects, loading: projectsLoading, error: projectsError, refetch } = useFetchProjects();
   const [isEditing, setIsEditing] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [expandedProjects, setExpandedProjects] = useState<Set<number>>(new Set());
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -20,6 +21,7 @@ export default function ProfilePage() {
   });
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const router = useRouter();
+  const DESCRIPTION_CHAR_LIMIT = 100;
 
   useEffect(() => {
     if (user) {
@@ -61,15 +63,12 @@ export default function ProfilePage() {
       if (profileImage) {
         data.append('profile_image', profileImage);
       }
-      console.log('Saving profile with data:', Object.fromEntries(data));
       
       const response = await updateUser(data);
-      console.log('Update response:', response);
       
       setIsEditing(false);
       window.location.reload();
     } catch (error) {
-      console.error('Error updating profile:', error);
       setSaveError((error as Error).message || 'Failed to update profile');
     }
   };
@@ -86,12 +85,28 @@ export default function ProfilePage() {
   };
 
   const handleNewProject = () => {
-    router.push('/projects/new');
+    router.push('/new-project-page');
   };
 
   const handleAnalyzeProject = (projectId: number) => {
-    console.log(`Analyzing project with ID: ${projectId}`);
   };
+  const toggleProjectExpanded = (projectId: number) => {
+    setExpandedProjects(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(projectId)) {
+        newSet.delete(projectId);
+      } else {
+        newSet.add(projectId);
+      }
+      return newSet;
+    });
+  };
+
+  const truncateText = (text: string, limit: number) => {
+    if (text.length <= limit) return text;
+    return text.substring(0, limit) + '...';
+  };
+
   const userProjects = projects.filter(project => project.user === parseInt(user?.id || '0'));
   const projectCount = userProjects.length;
 
@@ -154,43 +169,58 @@ export default function ProfilePage() {
         </div>
         <div className="mt-20">
           <h3 className="text-xl font-bold mb-4">My Projects</h3>
-          <hr className='p-3 text-gray-400'></hr>
+          <hr className='p-3 text-gray-400 pt-2'></hr>
           {userProjects.length > 0 ? (
             <div>
-              {userProjects.map(project => (
-                <div key={project.id} className="flex w-full mt-3 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                  <div className="relative">
-                    <img
-                      src={project.cover_image || '/placeholder-project.jpg'}
-                      alt={project.project_name}
-                      className="w-140 h-48 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                  </div>
-                  <div className="p-6">
-                    <h4 className="font-bold text-lg">{project.project_name}</h4>
-                    <p className="text-gray-600 mt-2">{project.project_description}</p>
-                    <div className="mt-4 flex justify-between">
-                      <span className="text-sm text-black-500">{project.project_field}</span>
-                      <span className="text-10 font-900 text-[#2F5A2B]">{project.project_location}</span>
-                    </div>
-                    <div className="mt-4 flex justify-between">
-                      <button
-                        onClick={() => handleAnalyzeProject(project.id)}
-                        className="px-4 py-2 bg-[#2F5A2B] text-white rounded-md hover:bg-[#AC7A15] flex items-center"
-                      >
-                        <FiBarChart2 className="h-4 w-4 mr-2" />
-                        Analyze
-                      </button>
-                      <span className="text-12 text-[#AC7A15] font-800 self-center">
-                        Updated: {new Date(project.updated_at || '2025-07-20').toLocaleDateString()}
-                      </span>
-                    </div>
-                    
-                  </div>
-                </div>
+              {userProjects.map(project => {
+                const isExpanded = expandedProjects.has(project.id);
+                const description = project.project_description || '';
+                const shouldTruncate = description.length > DESCRIPTION_CHAR_LIMIT;
+                const displayDescription = isExpanded ? description : truncateText(description, DESCRIPTION_CHAR_LIMIT);
                 
-              ))}
+                return (
+                  <div key={project.id} className="flex w-full mt-3 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                    <div className="relative w-100 h-48">
+                      <img
+                        src={project.cover_image || '/placeholder-project.jpg'}
+                        alt={project.project_name}
+                        className="w-100 h-48 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                    </div>
+                    <div className="p-6">
+                      <h4 className="font-bold text-lg">{project.project_name}</h4>
+                      <p className="text-gray-600 mt-2">
+                        {displayDescription}
+                        {shouldTruncate && (
+                          <button 
+                            onClick={() => toggleProjectExpanded(project.id)}
+                            className="text-[#AC7A15] font-medium ml-1 hover:underline"
+                          >
+                            {isExpanded ? 'Read Less' : 'Read More'}
+                          </button>
+                        )}
+                      </p>
+                      <div className="mt-4 flex justify-between">
+                        <span className="text-sm text-black-500">{project.project_field}</span>
+                        <span className="text-10 font-900 text-[#2F5A2B]">{project.project_location}</span>
+                      </div>
+                      <div className="mt-4 flex justify-between">
+                        <button
+                          onClick={() => handleAnalyzeProject(project.id)}
+                          className="px-4 py-2 bg-[#2F5A2B] text-white rounded-md hover:bg-[#AC7A15] flex items-center"
+                        >
+                          <FiBarChart2 className="h-4 w-4 mr-2" />
+                          Analyze
+                        </button>
+                        <span className="text-12 text-[#AC7A15] font-800 self-center">
+                          Updated: {new Date(project.updated_at || '2025-07-20').toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-8">
