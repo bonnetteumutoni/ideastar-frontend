@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FiBarChart2 } from 'react-icons/fi';
 import useFetchProjects from '../hooks/useFetchProjects';
 import Navigation from '../sharedComponents/Navigation';
 
@@ -171,8 +170,6 @@ export default function NewUserPage() {
     }
   };
 
-  const handleAnalyzeProject = (projectId: number) => {
-  };
   const toggleProjectExpanded = (projectId: number) => {
     setExpandedProjects(prev => {
       const newSet = new Set(prev);
@@ -306,14 +303,7 @@ export default function NewUserPage() {
                         <span className="text-sm text-black-500">{project.project_field}</span>
                         <span className="text-10 font-900 text-[#2F5A2B]">{project.project_location}</span>
                       </div>
-                      <div className="mt-4 flex justify-between">
-                        <button
-                          onClick={() => handleAnalyzeProject(project.id)}
-                          className="px-4 py-2 bg-[#2F5A2B] text-white rounded-md hover:bg-[#AC7A15] flex items-center"
-                        >
-                          <FiBarChart2 className="h-4 w-4 mr-2" />
-                          Analyze
-                        </button>
+                      <div className="mt-4 flex justify-end">
                         <span className="text-12 text-[#AC7A15] font-800 self-center">
                           Updated: {new Date(project.updated_at || '2025-07-20').toLocaleDateString()}
                         </span>
